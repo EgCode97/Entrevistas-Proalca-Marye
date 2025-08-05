@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App de Entrevistas Offline</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+
     <style>
         /* Universal selector for system-ui font */
         * {
@@ -526,6 +529,19 @@
                 // alert('Entrevist a guardada y archivo CSV descargado!');
             });
         });
+
+        // Código para registrar el Service Worker, al final del script
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/Entrevistas-Proalca-Marye/sw.js', { scope: '/Entrevistas-Proalca-Marye/' })
+                    .then(registration => {
+                        console.log('Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo en el registro del Service Worker:', error);
+                    });
+            });
+        }
     </script>
 </body>
 
