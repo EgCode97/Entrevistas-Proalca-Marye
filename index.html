@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Entrevistas Offline</title>
+    <style>
+        /* Universal selector for system-ui font */
+        * {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .app-header {
+            text-align: center;
+            padding: 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #eee;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            color: #333;
+        }
+
+        .app-header p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .card {
+            padding: 20px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #555;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            margin-right: 5px;
+        }
+
+        .nav-tab:hover {
+            background-color: #e2e6ea;
+        }
+
+        .nav-tab.active {
+            background-color: #fff;
+            border-color: #ddd;
+            border-bottom: 1px solid #fff;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            padding: 15px 0;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Estilos para el contenido de la Sección 1 (Guía de Entrevista) */
+        .content-section h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content-section p,
+        .content-section ul {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .content-section ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        .content-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .content-section strong {
+            color: #333;
+        }
+
+        /* Nuevos estilos para el formulario en la Sección 2 */
+        .interview-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-form-section {
+            background-color: #fcfcfc;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-form-section.section-1 {
+            background-color: #fefefe;
+        }
+
+        .card-form-section.section-2 {
+            background-color: #fbfbfb;
+        }
+
+        .card-form-section.section-3 {
+            background-color: #fafafa;
+        }
+
+
+        .card-form-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group>label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* Estilos para inputs de texto, email, tel y textarea */
+        .form-group input[type="text"],
+        .form-group input[type="tel"],
+        .form-group input[type="email"],
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* Estilos específicos para el grupo de radio buttons */
+        .radio-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .radio-option label {
+            font-weight: normal;
+            color: #555;
+            margin-bottom: 0;
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .submit-button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 17px;
+            width: 100%;
+            align-self: flex-start;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>App de Entrevistas Offline</h1>
+            <p>Instrumento de estudio de mercado para PROALCA.</p>
+        </header>
+
+        <div class="card">
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="tab1">Guía de Entrevista</button>
+                <button class="nav-tab" data-tab="tab2">Nueva Entrevista</button>
+                <button class="nav-tab" data-tab="tab3">Datos Guardados</button>
+            </nav>
+
+            <div class="tab-content">
+                <div id="tab1" class="tab-pane active">
+                    <div class="content-section">
+                        <h3>I. Introducción y Consentimiento</h3>
+                        <p>"¡Estimado(a) distribuidor/productor!</p>
+                        <p>En PROALCA, nos dedicamos a la fabricación y comercialización de Alimentos Balanceados para
+                            Animales (ABA) con un firme compromiso hacia la calidad de nuestros productos, la excelencia
+                            en el servicio y una profunda empatía con las necesidades de quienes, como usted, son el
+                            motor del sector agropecuario venezolano. Su opinión es invaluable para nosotros. Esta breve
+                            encuesta/entrevista nos permitirá entender mejor el mercado, sus expectativas y cómo podemos
+                            seguir innovando para ofrecerle soluciones que realmente le aporten valor. Su participación
+                            es completamente voluntaria y la información será tratada con estricta confidencialidad."
+                        </p>
+
+                        <h3>Consideraciones Clave para la Aplicación del Instrumento</h3>
+                        <ul>
+                            <li><strong>Entrenamiento del Equipo:</strong> Asegure que quienes apliquen este instrumento
+                                comprenda la importancia de la empatía al interactuar con los encuestados, y que sepan
+                                escuchar activamente y profundizar en las respuestas.</li>
+                            <li><strong>Ambiente de Confianza:</strong> Cree un ambiente donde los distribuidores y
+                                productores se sientan cómodos para expresar sus necesidades y opiniones honestamente.
+                            </li>
+                            <li><strong>Flexibilidad:</strong> Aunque es una guía estructurada, permita cierta
+                                flexibilidad en las entrevistas para explorar temas emergentes relevantes.</li>
+                            <li><strong>Análisis Cualitativo y Cuantitativo:</strong> Combine el análisis estadístico de
+                                las encuestas con la riqueza de los testimonios y las percepciones obtenidas en las
+                                entrevistas para una visión 360.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="tab2" class="tab-pane">
+                    <form class="interview-form" id="interviewForm">
+                        <div class="form-section card-form-section section-1">
+                            <h3>Introducción y Datos Básicos</h3>
+                            <div class="form-group radio-group-container">
+                                <label>Tipo de participante:</label>
+                                <div class="radio-options">
+                                    <div class="radio-option">
+                                        <input type="radio" id="participanteDistribuidor" name="tipoParticipante"
+                                            value="Distribuidor" required>
+                                        <label for="participanteDistribuidor">Distribuidor</label>
+                                    </div>
+
+                                    <div class="radio-option">
+                                        <input type="radio" id="participanteProductor" name="tipoParticipante"
+                                            value="Productor">
+                                        <label for="participanteProductor">Productor</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="nombreContacto">Nombre de contacto:</label>
+                                <input type="text" id="nombreContacto" name="nombreContacto" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoContacto">Cargo:</label>
+                                <input type="text" id="cargoContacto" name="cargoContacto">
+                            </div>
+                            <div class="form-group">
+                                <label for="correoElectronico">Correo Electrónico:</label>
+                                <input type="email" id="correoElectronico" name="correoElectronico">
+                            </div>
+                            <div class="form-group">
+                                <label for="ubicacionEstado">Ubicación (Estado):</label>
+                                <input type="text" id="ubicacionEstado" name="ubicacionEstado">
+                            </div>
+                            <div class="form-group">
+                                <label for="ubicacionMunicipio">Ubicación (Municipio):</label>
+                                <input type="text" id="ubicacionMunicipio" name="ubicacionMunicipio">
+                            </div>
+                            <div class="form-group">
+                                <label for="escalaOperacion">Escala de operación:</label>
+                                <input type="text" id="escalaOperacion" name="escalaOperacion"
+                                    placeholder="Ej: Pequeña, Mediana, Grande; o Volumen de compra/venta mensual de ABA">
+                            </div>
+                        </div>
+
+                        <div class="form-section card-form-section section-2">
+                            <h3>Análisis de Competencia</h3>
+                            <div class="form-group">
+                                <label for="competenciaMarcas">Además de PROALCA, ¿cuáles son las principales marcas de
+                                    alimentos balanceados para animales que usted utiliza, distribuye o conoce en el
+                                    mercado venezolano?</label>
+                                <textarea id="competenciaMarcas" name="competenciaMarcas" rows="4"
+                                    placeholder="Escriba su respuesta aquí..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="competenciaDestacar">De las marcas mencionadas, ¿cuáles considera que son
+                                    las más fuertes o dominantes? ¿Qué las hace destacarse? (Mencione específicamente en
+                                    términos de calidad de producto, precio, servicio o trato al cliente).</label>
+                                <textarea id="competenciaDestacar" name="competenciaDestacar" rows="4"
+                                    placeholder="Escriba su respuesta aquí..."></textarea>
+                            </div>
+                            <div class="form-group radio-group-container">
+                                <label>En relación con los precios generales del mercado, ¿cómo percibe el nivel de
+                                    precios de las principales marcas competidoras?</label>
+                                <div class="radio-options">
+                                    <div class="radio-option">
+                                        <input type="radio" id="preciosMasEconomicos" name="nivelPreciosCompetencia"
+                                            value="Más económicos que el promedio." required>
+                                        <label for="preciosMasEconomicos">Más económicos que el promedio.</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="preciosEnLinea" name="nivelPreciosCompetencia"
+                                            value="En línea con el promedio del mercado.">
+                                        <label for="preciosEnLinea">En línea con el promedio del mercado.</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="preciosMasCostosos" name="nivelPreciosCompetencia"
+                                            value="Más costosos que el promedio.">
+                                        <label for="preciosMasCostosos">Más costosos que el promedio.</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="serviciosAdicionalesCompetencia">Más allá del producto, ¿qué servicios
+                                    adicionales ofrecen sus proveedores actuales o las marcas competidoras que usted
+                                    realmente valora?</label>
+                                <textarea id="serviciosAdicionalesCompetencia" name="serviciosAdicionalesCompetencia"
+                                    rows="4" placeholder="Escriba su respuesta aquí..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="vaciosServicioCompetencia">¿Existen vacíos o necesidades de servicio que la
+                                    competencia no esté cubriendo y que usted desearía que se ofrecieran?</label>
+                                <textarea id="vaciosServicioCompetencia" name="vaciosServicioCompetencia" rows="4"
+                                    placeholder="Escriba su respuesta aquí..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-section card-form-section section-3">
+                            <h3>Percepción de PROALCA y Oportunidades de Mejora</h3>
+                            <div class="form-group">
+                                <label for="proalcaFortaleza">Si ha tenido contacto o ha usado productos PROALCA: ¿Qué
+                                    destacaría como la principal fortaleza de PROALCA en cuanto a la calidad de sus
+                                    productos, la atención o el servicio?</label>
+                                <textarea id="proalcaFortaleza" name="proalcaFortaleza" rows="4"
+                                    placeholder="Escriba su respuesta aquí..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="proalcaSugerencias">¿Qué sugerencias nos daría para que PROALCA mejore aún
+                                    más su oferta de productos y la calidad de su servicio y empatía con clientes como
+                                    usted?</label>
+                                <textarea id="proalcaSugerencias" name="proalcaSugerencias" rows="4"
+                                    placeholder="Escriba su respuesta aquí..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="proalcaIniciativas">Si PROALCA decidiera ofrecer una experiencia de servicio
+                                    aún más cercana y empática, ¿qué acciones o iniciativas le gustaría que
+                                    implementáramos para que usted se sienta verdaderamente apoyado y comprendido en sus
+                                    desafíos?</label>
+                                <textarea id="proalcaIniciativas" name="proalcaIniciativas" rows="4"
+                                    placeholder="Escriba su respuesta aquí..."></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-button">Guardar Entrevista</button>
+                    </form>
+                </div>
+                <div id="tab3" class="tab-pane">
+                    <p>Aquí se mostrarán los datos guardados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            const interviewForm = document.getElementById('interviewForm'); // Get the form by its ID
+
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove 'active' class from all tabs and panes
+                    navTabs.forEach(item => item.classList.remove('active'));
+                    tabPanes.forEach(item => item.classList.remove('active'));
+
+                    // Add 'active' class to the clicked tab
+                    tab.classList.add('active');
+
+                    // Get the target tab pane ID
+                    const targetTabId = tab.dataset.tab;
+
+                    // Add 'active' class to the corresponding tab pane
+                    document.getElementById(targetTabId).classList.add('active');
+                });
+            });
+
+            // Activate the first tab by default on page load
+            if (navTabs.length > 0 && tabPanes.length > 0) {
+                navTabs[0].classList.add('active');
+                tabPanes[0].classList.add('active');
+            }
+
+            // Function to generate and download the CSV
+            function GenerarCSV(formElement) {
+                const orderedData = {};
+                const allQuestions = formElement.querySelectorAll('.form-group > label, .form-group.radio-group-container > label');
+
+                allQuestions.forEach(questionLabel => {
+                    let questionText = questionLabel.textContent.replace(':', '').trim();
+                    let fieldName = '';
+                    let fieldValue = '';
+
+                    // Determine the associated input field(s)
+                    const parentFormGroup = questionLabel.closest('.form-group');
+                    if (parentFormGroup) {
+                        const inputElement = parentFormGroup.querySelector('input[type="text"], input[type="email"], input[type="tel"], textarea');
+                        if (inputElement) {
+                            fieldName = inputElement.name;
+                            fieldValue = inputElement.value;
+                        } else {
+                            // This is likely a radio group
+                            const radioGroupInputs = parentFormGroup.querySelectorAll('input[type="radio"]');
+                            if (radioGroupInputs.length > 0) {
+                                fieldName = radioGroupInputs[0].name; // Use the name of the first radio in the group
+                                const selectedRadio = parentFormGroup.querySelector('input[type="radio"]:checked');
+                                fieldValue = selectedRadio ? selectedRadio.value : '';
+                            }
+                        }
+                    }
+
+                    if (fieldName) {
+                        orderedData[questionText] = fieldValue;
+                    }
+                });
+
+                const finalHeaders = Object.keys(orderedData);
+                const finalValues = Object.values(orderedData);
+
+                // Function to escape double quotes and wrap in quotes for CSV
+                const escapeCSV = (text) => {
+                    if (text === null || text === undefined) {
+                        return '""'; // Represent null/undefined as empty string in CSV
+                    }
+                    // Convert to string and escape existing double quotes
+                    let str = String(text);
+                    str = str.replace(/"/g, '""');
+                    // Wrap the entire field in double quotes
+                    return `"${str}"`;
+                };
+
+                const csvHeaders = finalHeaders.map(escapeCSV).join(',');
+                const csvValues = finalValues.map(escapeCSV).join(',');
+
+                const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(csvHeaders + '\n' + csvValues);
+                // const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(csvValues);
+                // console.log(csvContent);
+
+                // Create a temporary link and trigger download
+                const link = document.createElement('a');
+                link.setAttribute('href', csvContent);
+
+                // Format the current date for the filename
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+                const day = now.getDate().toString().padStart(2, '0');
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                // Include contact name in filename if available, fallback to a generic name
+                const contactNameInput = formElement.querySelector('#nombreContacto');
+                const contactName = contactNameInput && contactNameInput.value ? `_${contactNameInput.value.replace(/[^a-zA-Z0-9_]/g, '')}` : ''; // Sanitize name for filename
+                const filename = `Entrevista_PROALCA${contactName}_${year}${month}${day}_${hours}${minutes}${seconds}.csv`;
+
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            // Handle form submission
+            interviewForm.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                GenerarCSV(this); // Call the GenerarCSV function, passing the form element
+
+                // Optionally, reset the form after download
+                // this.reset();
+                // alert('Entrevist a guardada y archivo CSV descargado!');
+            });
+        });
+    </script>
+</body>
+
+</html>
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Entrevistas Offline</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .app-header {
+            text-align: center;
+            padding: 20px;
+            background-color: #ffffff;
+            /* Ajustado para que coincida con la imagen */
+            border-bottom: 1px solid #eee;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            color: #333;
+        }
+
+        .app-header p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .card {
+            padding: 20px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #555;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            margin-right: 5px;
+            /* Espacio entre pestañas */
+        }
+
+        .nav-tab:hover {
+            background-color: #e2e6ea;
+        }
+
+        .nav-tab.active {
+            background-color: #fff;
+            border-color: #ddd;
+            border-bottom: 1px solid #fff;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            padding: 15px 0;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Estilos para el contenido de la Sección 1 (Guía de Entrevista) */
+        .content-section h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content-section p,
+        .content-section ul {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .content-section ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        .content-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .content-section strong {
+            color: #333;
+        }
+
+        /* Nuevos estilos para el formulario en la Sección 2 */
+        .interview-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            /* Espacio entre las secciones del formulario */
+        }
+
+        .card-form-section {
+            background-color: #fcfcfc;
+            /* Fondo ligeramente diferente para las tarjetas */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            /* Bordes redondeados */
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Puedes variar los fondos si quieres que sean sutilmente diferentes */
+        .card-form-section.section-1 {
+            background-color: #fefefe;
+        }
+
+        .card-form-section.section-2 {
+            background-color: #fbfbfb;
+        }
+
+        .card-form-section.section-3 {
+            background-color: #fafafa;
+        }
+
+
+        .card-form-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="tel"],
+        .form-group input[type="email"],
+        .form-group textarea {
+            width: calc(100% - 20px);
+            /* Ajusta el ancho para que el padding no lo exceda */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            /* Incluye padding y border en el ancho */
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            /* Permite redimensionar verticalmente */
+            min-height: 60px;
+        }
+
+        .submit-button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 17px;
+            align-self: flex-start;
+            /* Alinea el botón a la izquierda */
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>App de Entrevistas Offline</h1>
+            <p>Instrumento de estudio de mercado para PROALCA.</p>
+        </header>
+
+        <div class="card">
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="tab1">Guía de Entrevista</button>
+                <button class="nav-tab" data-tab="tab2">Nueva Entrevista</button>
+                <button class="nav-tab" data-tab="tab3">Datos Guardados</button>
+            </nav>
+
+            <div class="tab-content">
+                <div id="tab1" class="tab-pane active">
+                    <h2>Sección 1</h2>
+                    <div class="content-section">
+                        <h3>I. Introducción y Consentimiento</h3>
+                        <p>"¡Estimado(a) distribuidor/productor!</p>
+                        <p>En PROALCA, nos dedicamos a la fabricación y comercialización de Alimentos Balanceados para
+                            Animales (ABA) con un firme compromiso hacia la calidad de nuestros productos, la excelencia
+                            en
+                            el servicio y una profunda empatía con las necesidades de quienes, como usted, son el motor
+                            del
+                            sector agropecuario venezolano. Su opinión es invaluable para nosotros. Esta breve
+                            encuesta/entrevista nos permitirá entender mejor el mercado, sus expectativas y cómo podemos
+                            seguir innovando para ofrecerle soluciones que realmente le aporten valor. Su participación
+                            es
+                            completamente voluntaria y la información será tratada con estricta confidencialidad."</p>
+
+                        <h3>Consideraciones Clave para la Aplicación del Instrumento</h3>
+                        <ul>
+                            <li><strong>Entrenamiento del Equipo:</strong> Asegure que quienes apliquen este instrumento
+                                comprendan la importancia de la empatía al interactuar con los encuestados, y que sepan
+                                escuchar activamente y profundizar en las respuestas.</li>
+                            <li><strong>Ambiente de Confianza:</strong> Cree un ambiente donde los distribuidores y
+                                productores se sientan cómodos para expresar sus necesidades y opiniones honestamente.
+                            </li>
+                            <li><strong>Flexibilidad:</strong> Aunque es una guía estructurada, permita cierta
+                                flexibilidad
+                                en las entrevistas para explorar temas emergentes relevantes.</li>
+                            <li><strong>Análisis Cualitativo y Cuantitativo:</strong> Combine el análisis estadístico de
+                                las
+                                encuestas con la riqueza de los testimonios y las percepciones obtenidas en las
+                                entrevistas
+                                para una visión 360.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="tab2" class="tab-pane">
+                    <h2>Sección 2 - Nueva Entrevista</h2>
+                    <form class="interview-form">
+                        <div class="form-section card-form-section section-1">
+                            <h3>Datos del Entrevistado</h3>
+                            <div class="form-group">
+                                <label for="nombre">Nombre:</label>
+                                <input type="text" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="empresa">Empresa:</label>
+                                <input type="text" id="empresa" name="empresa">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargo">Cargo:</label>
+                                <input type="text" id="cargo" name="cargo">
+                            </div>
+                        </div>
+
+                        <div class="form-section card-form-section section-2">
+                            <h3>Información de Contacto</h3>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono:</label>
+                                <input type="tel" id="telefono" name="telefono">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" name="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="ciudad">Ciudad:</label>
+                                <input type="text" id="ciudad" name="ciudad">
+                            </div>
+                        </div>
+
+                        <div class="form-section card-form-section section-3">
+                            <h3>Preferencias y Observaciones</h3>
+                            <div class="form-group">
+                                <label for="intereses">Intereses principales:</label>
+                                <textarea id="intereses" name="intereses" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="observaciones">Observaciones adicionales:</label>
+                                <textarea id="observaciones" name="observaciones" rows="5"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-button">Guardar Entrevista</button>
+                    </form>
+                </div>
+                <div id="tab3" class="tab-pane">
+                    <h2>Sección 3</h2>
+                    <p>Aquí se mostrarán los datos guardados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove 'active' class from all tabs and panes
+                    navTabs.forEach(item => item.classList.remove('active'));
+                    tabPanes.forEach(item => item.classList.remove('active'));
+
+                    // Add 'active' class to the clicked tab
+                    tab.classList.add('active');
+
+                    // Get the target tab pane ID
+                    const targetTabId = tab.dataset.tab;
+
+                    // Add 'active' class to the corresponding tab pane
+                    document.getElementById(targetTabId).classList.add('active');
+                });
+            });
+
+            // Optionally, activate the first tab by default on page load
+            if (navTabs.length > 0 && tabPanes.length > 0) {
+                navTabs[0].classList.add('active');
+                tabPanes[0].classList.add('active');
+            }
+        });
+    </script>
+</body>
+
+</html> -->
